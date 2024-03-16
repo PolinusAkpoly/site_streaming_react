@@ -16,7 +16,7 @@ interface ContainerProps {
 
 const Container : FC<ContainerProps> = () =>{
 
-const [displayModal, setDisplayModal] = useState<boolean>(true)
+const [displayModal, setDisplayModal] = useState<boolean>(false)
 
     useEffect(() => {
       window.scrollTo(0,0)
@@ -35,7 +35,7 @@ const [displayModal, setDisplayModal] = useState<boolean>(true)
          {
           displayModal?
           < VideoFormModal
-          hideModale= {()=>setDisplayModal(false)}
+          hideModal= {()=>setDisplayModal(false)}
           />
           :
           null
