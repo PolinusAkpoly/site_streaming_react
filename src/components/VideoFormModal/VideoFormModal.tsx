@@ -8,7 +8,8 @@ import React, { FC, useEffect, useState } from 'react';
 import './VideoFormModal.css';
 import { Button, Modal } from 'react-bootstrap';
 import { Video } from '../../models/Video';
-import { generateFileUrl } from '../../helpers/utils';
+import { convertFileToBlob, generateFileUrl } from '../../helpers/utils';
+import { addVideo } from '../../api/api-video';
 
 
 interface VideoFormModalProps {
@@ -21,15 +22,17 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
   const [formData, setFormData] = useState<Video>({
     title: "",
     description: "",
-    poster: null,
-    link: null,
+    poster: '',
+    link: '',
     isAvailable: false,
     category: ""
   });
-  // console.log(formData);
+  console.log(formData);
   
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [formSubmitError, setFormSubmitError] = useState<string>("")
   
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const runLocalData = async () => {
@@ -53,17 +56,24 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
       const fileUrl = generateFileUrl(file)
       console.log(fileUrl);
        if (name === "poster") {
-        newValue[name] = fileUrl
+        if (!file.type.startsWith('image/')) {
+          return;
+        }
+        // newValue[name] = fileUrl
        }
        if (name === "link") {
-        newValue[name] = fileUrl
+        if (!file.type.startsWith('video/')) {
+          return;
+        }
+        // newValue[name] = fileUrl
        }
+       newValue[name] = fileUrl
       formErrors[name] = '';
     } else {
       newValue[name] = value
       formErrors[name] = '';
     }
-    console.log(newValue);
+    // console.log(newValue);
 
     setFormData(newValue)
 
@@ -92,11 +102,43 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
     return Object.keys(error).length === 0;
   };
   
-  const handleSubmit = (event: any) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     if (!validate()) {
       return;
     }
+       
+    try {
+       const video: Video = formData  
+       video.created_at = new Date()
+      //  video.poster =  await convertFileToBlob(video.poster as File)
+      //  video.link =  await convertFileToBlob(video.link as File)
+console.log(video);
+
+       const result = await addVideo(video)
+    
+      if (result.isSuccess) {
+       setFormData({
+        title: '',
+        description: '',
+        poster: '',
+        link: '',
+        category: '',
+        isAvailable: true
+       })
+
+      hideModal()
+    }
+
+    } catch (error) {
+      setFormSubmitError('Error, please try again later !')
+    }
+
+
+    
+
+  
+
   };
   
   return (
@@ -107,6 +149,9 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
         </Modal.Header>
         <Modal.Body>
           <form onSubmit={handleSubmit} >
+           {
+            formSubmitError? <div className="text-danger">{formSubmitError}</div>: null
+           }
             <div className='form-group'>
               <label htmlFor="title">Title : </label>
               <input
