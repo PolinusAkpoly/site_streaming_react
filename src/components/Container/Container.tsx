@@ -10,8 +10,9 @@ import VideoFormModal from '../VideoFormModal/VideoFormModal';
 import { convertBlobToUrl} from '../../helpers/utils';
 import { Video } from '../../models/Video';
 
-import { getAllVideo } from '../../api/api-video';
+import { deleteVideo, getAllVideo } from '../../api/api-video';
 import ViewVideoModal from '../ViewVideoModal/ViewVideoModal';
+import DeleteVideoModal from '../DeleteVideoModal/DeleteVideoModal';
 
 
 interface ContainerProps {
@@ -24,42 +25,64 @@ const Container : FC<ContainerProps> = () =>{
 const [displayModal, setDisplayModal] = useState<boolean>(false)
 const [displayViewModal, setDisplayViewModal] = useState<boolean | number>(false)
 const [videoDatas, setVideoDatas] = useState<Video[]>([])
-console.log(videoDatas);
+const [idVideoUpdate, setIdVideoUpdate] = useState<number | null>()
+const [idVideoDelete, setIdVideoDelete] = useState<number>()
+const [displayDeleteVideoModal, setDisplayDeleteVideoModal] = useState<boolean>(false)
+// console.log(videoDatas);
 
-    useEffect(() => {
-      window.scrollTo(0,0)
-      const runLocalData = async () => {
+const runLocalData = async () => {
 
-        const datas: any = await getAllVideo()
-        if (datas.isSuccess) {
-          datas.results?.map((data: Video)=>{
-            // data.poster =  convertBlobToUrl(data.poster as Blob)
-            // data.link =  convertBlobToUrl(data.link as Blob)
-            return data
+  const datas: any = await getAllVideo()
+  if (datas.isSuccess) {
+    datas.results?.map((data: Video)=>{
+      // console.log(data);
+      // data.poster =  convertBlobToUrl(data.poster as Blob)
+      // data.link =  convertBlobToUrl(data.link as Blob)
+      
+      
+      return data
 
-          })
+    })
 
-          setVideoDatas(datas.results)
-        }
-
-
-      }
-      runLocalData()
-    },[])
-
-const handleView = (id: number) =>{
-setDisplayViewModal(id)
-console.log(id);
+    setVideoDatas(datas.results)
+  }
 
 
 }
 
+    useEffect(() => {
+      window.scrollTo(0,0)
+     
+      runLocalData()
+    },[])
 
+  const handleAddVideo = () =>{
+    setDisplayModal(true)
+    setIdVideoUpdate(null)
+  }
 
+const handleView = (id: number) =>{
+setDisplayViewModal(id)
+console.log(id);
+}
+
+const handleEdite = (id: number) =>{
+  setIdVideoUpdate(id)
+  setDisplayModal(true)
+
+}
+
+const handleConfirmDelete = async (id: number) =>{
+  setIdVideoDelete(id);
+  setDisplayDeleteVideoModal(true)
+  // await deleteVideo(id)
+  // videoDatas.filter((videoData)=>videoData._id !=id )
+
+}
 
   return (
       <div className="container">
-         <button className="btn btn-primary my-2" onClick={()=>setDisplayModal(true)}>
+         <button className="btn btn-primary my-2" onClick={handleAddVideo}>
           Add Video
          </button>
 
@@ -67,6 +90,8 @@ console.log(id);
           displayModal?
           < VideoFormModal
           hideModal= {()=>setDisplayModal(false)}
+          videoId= {idVideoUpdate as number}
+          actualiseContainer={runLocalData()}
           />
           :
           null
@@ -76,6 +101,16 @@ console.log(id);
           < ViewVideoModal
           hideModal= {()=>setDisplayViewModal(false)}
           videId ={displayViewModal as number}
+          />
+          :
+          null
+         }
+         {
+          displayDeleteVideoModal && idVideoDelete?
+          < DeleteVideoModal
+          hideModal= {()=>setDisplayDeleteVideoModal(false)}
+          idVideoDelete ={idVideoDelete}
+          actualiseContainer={runLocalData()}
           />
           :
           null
@@ -99,8 +134,8 @@ console.log(id);
                               <td> <img src={videoData.poster as string} width={80} alt={videoData.title} /></td>
                               <td>
                                 <button className="btn btn-success m-1" onClick = {()=>{handleView(videoData._id!)}}>View</button>
-                                <button className="btn btn-primary m-1">Edit</button>
-                                <button className="btn btn-danger m-1">Delete</button>
+                                <button className="btn btn-primary m-1" onClick = {()=>{handleEdite(videoData._id!)}}>Edit</button>
+                                <button className="btn btn-danger m-1"  onClick = {()=>{handleConfirmDelete(videoData._id!)}}>Delete</button>
                               </td>
                           </tr>
                   })

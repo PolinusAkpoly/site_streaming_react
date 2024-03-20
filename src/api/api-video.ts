@@ -2,6 +2,8 @@ import { Video } from "../models/Video";
 import { db } from "./database";
 
 export const addVideo = async (video: Video) => {
+  console.log(video);
+  
   try {
     await db.addData("videos", video);
     return {

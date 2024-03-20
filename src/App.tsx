@@ -1,18 +1,27 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home/Home';
+import Account from './pages/Account/Account';
 import Header from './components/Header/Header';
-import Container from './components/Container/Container';
-// import Footer from './components/Footer/Footer';
+import ErrorPage from './pages/ErrorPage/ErrorPage';
+
 
 
 function App() {
   return (
-    <div className="App">
+  
+      <BrowserRouter>
       <Header/>
-      <Container/>
-      {/* <Footer/> */}
-    </div>
+      <Routes>
+        <Route path='/'  element={<Home/>}/>
+        <Route path='/account'  element={<Account/>}/>
+        <Route path='/*'  element={<ErrorPage/>}/>
+
+      </Routes>
+      </BrowserRouter>
+    
   );
 }
 

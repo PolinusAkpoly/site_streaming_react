@@ -9,15 +9,17 @@ import './VideoFormModal.css';
 import { Button, Modal } from 'react-bootstrap';
 import { Video } from '../../models/Video';
 import { convertFileToBlob, generateFileUrl } from '../../helpers/utils';
-import { addVideo } from '../../api/api-video';
+import { addVideo, getVideo, updateVideo } from '../../api/api-video';
 
 
 interface VideoFormModalProps {
   hideModal: () => void
+  videoId?: number
+  actualiseContainer: any
 }
 
 
-const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
+const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal, videoId, actualiseContainer }) => {
 
   const [formData, setFormData] = useState<Video>({
     title: "",
@@ -27,23 +29,37 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
     isAvailable: false,
     category: ""
   });
-  console.log(formData);
-  
+  // const [videoUpdating, setVideoUpdating] = useState<Video>()
+  // const [formData, setFormData] = useState<Video>(videoUpdating as Video);
+
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formSubmitError, setFormSubmitError] = useState<string>("")
-  
+  // console.log(formData);
+
+  // console.log(videoUpdating);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const runLocalData = async () => {
-      // Código relacionado con la carga de datos locales
+      if (videoId) {
+        const videoData = await getVideo(videoId)
+        console.log(videoData);
+        if (videoData.isSuccess) {
+          // setVideoUpdating(videoData.result as Video)
+          setFormData(videoData.result as Video)
+
+        }
+
+      }
+
+
     };
     runLocalData();
-  }, []);
-  
-  
-  
-  const handleInputChange = (event: any) => {
+  }, [videoId]);
+
+
+
+  const handleInputChange = async (event: any) => {
     const { name, value, type, files, checked } = event.target
     // console.log({ name, value, type, files, checked });
 
@@ -53,21 +69,21 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
       formErrors[name] = '';
     } else if (type === "file") {
       const file = files[0]
-      const fileUrl = generateFileUrl(file)
-      console.log(fileUrl);
-       if (name === "poster") {
+      const fileUrl = await generateFileUrl(file)
+      // console.log(fileUrl);
+      if (name === "poster") {
         if (!file.type.startsWith('image/')) {
           return;
         }
         // newValue[name] = fileUrl
-       }
-       if (name === "link") {
+      }
+      if (name === "link") {
         if (!file.type.startsWith('video/')) {
           return;
         }
         // newValue[name] = fileUrl
-       }
-       newValue[name] = fileUrl
+      }
+      newValue[name] = fileUrl
       formErrors[name] = '';
     } else {
       newValue[name] = value
@@ -95,52 +111,179 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal }) => {
     if (!formData.link) {
       error.link = 'Video is required';
     }
-  // console.log(error);
-  
+    // console.log(error);
+
     setFormErrors(error);
-  
+
     return Object.keys(error).length === 0;
   };
-  
+
+  // const handleSubmit = async (event: any) => {
+  //   event.preventDefault();
+  //   if (!validate()) {
+  //     return;
+  //   }
+
+  //   try {
+  //     if (videoId) {
+  //       const video: Video = formData
+  //       video.created_at = new Date()
+  //       const result = await updateVideo(video)
+
+  //       if (result.isSuccess) {
+  //         setFormData({
+  //           title: '',
+  //           description: '',
+  //           poster: '',
+  //           link: '',
+  //           category: '',
+  //           isAvailable: true
+  //         })
+
+  //         hideModal()
+
+
+  //       } else {
+  //         const video: Video = formData
+  //         video.created_at = new Date()
+  //         //  video.poster =  await convertFileToBlob(video.poster as File)
+  //         //  video.link =  await convertFileToBlob(video.link as File)
+  //         console.log(video);
+
+  //         const result = await addVideo(video)
+
+  //         if (result.isSuccess) {
+  //           setFormData({
+  //             title: '',
+  //             description: '',
+  //             poster: '',
+  //             link: '',
+  //             category: '',
+  //             isAvailable: true
+  //           })
+
+  //           hideModal()
+
+
+  //         }
+  //       }
+  //     }
+  //       } catch (error) {
+  //         setFormSubmitError('Error, please try again later !')
+  //       }
+
+
+
+
+
+
+  //     };
+  // const handleSubmit = async (event: any) => {
+  //   event.preventDefault();
+  //   if (!validate()) {
+  //     return;
+  //   }
+
+  //   try {
+  //     const video: Video = formData;
+  //     let result
+
+  //     if (videoId) {
+
+  //       video.updated_at = new Date()
+  //       video.poster = await convertFileToBlob(video.poster as File)
+  //       video.link = await convertFileToBlob(video.link as File)
+  //       result = await updateVideo(video);
+
+
+
+  //     } else {
+
+        
+  //       video.poster = await convertFileToBlob(video.poster as File)
+  //       video.link = await convertFileToBlob(video.link as File)
+  //       video.created_at = new Date()
+  //       result = await addVideo(video);
+
+  //     }
+
+  //     if (result.isSuccess) {
+  //       setFormData({
+  //         title: '',
+  //         description: '',
+  //         poster: '',
+  //         link: '',
+  //         category: '',
+  //         isAvailable: true
+  //       });
+
+
+  //       hideModal();
+  //       actualiseContainer()
+  //     }
+
+  //   } catch (error) {
+  //     setFormSubmitError('Error, please try again later!');
+  //   }
+  // };
   const handleSubmit = async (event: any) => {
-    event.preventDefault();
+    event.preventDefault()
     if (!validate()) {
-      return;
+      return
     }
-       
+
     try {
-       const video: Video = formData  
-       video.created_at = new Date()
-      //  video.poster =  await convertFileToBlob(video.poster as File)
-      //  video.link =  await convertFileToBlob(video.link as File)
-console.log(video);
+      
+      const video: Video = formData
 
-       const result = await addVideo(video)
-    
-      if (result.isSuccess) {
-       setFormData({
-        title: '',
-        description: '',
-        poster: '',
-        link: '',
-        category: '',
-        isAvailable: true
-       })
+      let result
+      if (videoId) {
+       
+        // if(video.poster instanceof File){
+        //   video.poster = await convertFileToBlob(video.poster as File)
+        // }
+        // if(video.link instanceof File){
+        //   video.link = await convertFileToBlob(video.link as File)
+        // }
+        
+        video.updated_at = new Date()
 
-      hideModal()
-    }
+        result = await updateVideo(video)
+
+
+      } else {
+       
+        // video.poster = await convertFileToBlob(video.poster as File)
+        // video.link = await convertFileToBlob(video.link as File)
+        video.created_at = new Date()
+        console.log(video);
+        
+        result = await addVideo(video)
+      }
+
+
+      if (result?.isSuccess) {
+        setFormData({
+          title: '',
+          description: '',
+          poster: null,
+          link: null,
+          category: '',
+          isAvailable: true
+        })
+        // actualiseContainer()
+        hideModal()
+        actualiseContainer()
+      }
+
 
     } catch (error) {
       setFormSubmitError('Error, please try again later !')
+
     }
+ 
+  }
 
-
-    
-
-  
-
-  };
-  
   return (
     <div className="VideoFormModal">
       <Modal show={true} onHide={hideModal} size='lg' scrollable>
@@ -149,9 +292,9 @@ console.log(video);
         </Modal.Header>
         <Modal.Body>
           <form onSubmit={handleSubmit} >
-           {
-            formSubmitError? <div className="text-danger">{formSubmitError}</div>: null
-           }
+            {
+              formSubmitError ? <div className="text-danger">{formSubmitError}</div> : null
+            }
             <div className='form-group'>
               <label htmlFor="title">Title : </label>
               <input
@@ -159,7 +302,7 @@ console.log(video);
                 id='title'
                 name='title'
                 className={`form-control ${formErrors.title ? 'is-invalid' : ''}`}
-                value={formData.title}
+                defaultValue={formData.title}
                 onChange={handleInputChange}
               />
               {formErrors.title && <div className="invalid-feedback">{formErrors.title}</div>}
@@ -185,12 +328,13 @@ console.log(video);
                 id='poster'
                 className={`form-control ${formErrors.poster ? 'is-invalid' : ''}`}
                 onChange={handleInputChange}
+                defaultValue={formData.poster as string}
               />
               {
                 formErrors.poster ? <div className="invalid-feedback">{formErrors.poster}</div> : null
               }
               <div className='previewsimage m-2'>
-                <img src={`${formData.poster}`} alt="" width={'100%'}/>
+                <img src={`${formData.poster}`} alt="" width={'100%'} />
               </div>
             </div>
             <div className='form-group'>
@@ -201,12 +345,13 @@ console.log(video);
                 id='video'
                 className={`form-control ${formErrors.link ? 'is-invalid' : ''}`}
                 onChange={handleInputChange}
+                defaultValue={formData.link as string}
               />
-               {
+              {
                 formErrors.link ? <div className="invalid-feedback">{formErrors.link}</div> : null
               }
               <div className='previewsimage m-2'>
-                <video controls src={`${formData.link}`} width={'100%'}/>
+                <video controls src={`${formData.link}`} width={'100%'} />
               </div>
             </div>
             <div className='form-group'>
@@ -229,7 +374,7 @@ console.log(video);
                 type="checkbox"
                 role="switch"
                 id="isAvailable"
-                checked={formData.isAvailable}
+                defaultChecked={formData.isAvailable}
                 onChange={handleInputChange}
               />
             </div>
