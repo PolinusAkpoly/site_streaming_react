@@ -1,0 +1,11 @@
+/*
+  Authors : Mudey Formation
+  Website : https://mudey.fr/
+  App Name : E-commerce with React.Js
+  Created At : 21/03/2024 9:54:33
+*/
+
+.video-card a {
+  color: inherit;
+  text-decoration: none;
+}

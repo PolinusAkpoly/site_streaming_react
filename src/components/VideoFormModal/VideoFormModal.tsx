@@ -361,6 +361,7 @@ const VideoFormModal: FC<VideoFormModalProps> = ({ hideModal, videoId, actualise
                 <option value="Education">Education</option>
                 <option value="Culture">Culture</option>
                 <option value="Foramtion">Foramtion</option>
+                <option value="Cinema">Cinema</option>
               </select>
               {
                 formErrors.category ? <div className="invalid-feedback">{formErrors.category}</div> : null
