@@ -7,8 +7,8 @@
 import React, { FC, useEffect,Fragment, useState } from 'react';
 // import Loading from '../Loading/Loading';
 import './MediaReader.css';
-import { useParams } from 'react-router-dom';
-import { getVideo } from '../../api/api-video';
+import { useParams, useNavigate } from 'react-router-dom';
+import { searchVideoBySlug } from '../../api/api-video';
 import { Video } from '../../models/Video';
 import { OuitubePlayer } from 'ouitube-player';
 import PlayList from '../../components/PlayList/PlayList';
@@ -23,35 +23,48 @@ const MediaReader : FC<MediaReaderProps> = () =>{
 
 
     // const [state, setState] = useState<any>(null)
-    // const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<boolean>(false);
     // const [value, setValue] = useState('');
     const [video, setVideo] = useState<Video>();
-    const {videoId} = useParams()
+    const {slug} = useParams()
+    const navigate = useNavigate()
 
 
 
     useEffect(() => {
       window.scrollTo(0,0)
       const runLocalData = async () => {
-        if (videoId) {
-          let id = parseInt(videoId)
-          const data = await getVideo(id)
+        if (slug) {
+          try{
+          // let id = parseInt(videoId)
+          const data = await searchVideoBySlug(slug)
           console.log(data);
           if (data.isSuccess) {
             setVideo(data.result as Video)
+          }else{
+            setError(true);
           }
 
+          }catch(error) {
+            setError(true);
+
+          }
+          
         }
 
         // setLoading(false)
       }
       runLocalData()
-    },[videoId])
+    },[slug])
+
+if(error){
+  navigate('/error')
+}
+
+
 
   return (
     <Fragment>
-   
-     
       <div className="container-fluid">
          {
           video ?
@@ -64,7 +77,7 @@ const MediaReader : FC<MediaReaderProps> = () =>{
               </div>
               <div className="col-md-3">
               <PlayList
-              videoId={videoId}
+              videoId={video._id!}
               />
               </div>
             </div>

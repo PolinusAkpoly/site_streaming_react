@@ -1,3 +1,4 @@
+import { slugyfy } from "../helpers/slugHelpers";
 import { Video } from "../models/Video";
 import { db } from "./database";
 
@@ -5,6 +6,7 @@ export const addVideo = async (video: Video) => {
   console.log(video);
   
   try {
+    video.slug = slugyfy(video.title)
     await db.addData("videos", video);
     return {
       isSuccess: true,
@@ -78,3 +80,23 @@ export const deleteVideo = async (_id: number) => {
     };
   }
 };
+
+export const searchVideoBySlug = async (slug: string) => {
+  try {
+   const video = await db.search("videos", 'slug', slug);
+    return {
+      isSuccess: true,
+      result: video[0],
+    };
+  } catch (error) {
+    console.log({ error });
+    return {
+      isSuccess: false,
+      error,
+    };
+  }
+};
+
+
+
+

@@ -1,7 +1,8 @@
 import { Category } from "./Category";
 
 export interface Video {
-  _id?: number
+  _id?: number;
+  slug?:string;
   title: string;
   description: string;
   poster: File | Blob | string | null; //File | null | string ;

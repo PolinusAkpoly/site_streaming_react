@@ -12,7 +12,7 @@ import PlayListItem from '../PlayListItem/PlayListItem';
 
 
 interface PlayListProps {
-  videoId?: string
+  videoId?: number
 }
 
 
@@ -24,6 +24,8 @@ const PlayList : FC<PlayListProps> = ({videoId}) =>{
 
     const datas: any = await getAllVideo()
     if (datas.isSuccess) {
+      console.log(datas.results);
+      
       datas.results?.map((data: Video)=>{
         // console.log(data);
         // data.poster =  convertBlobToUrl(data.poster as Blob)
@@ -49,7 +51,7 @@ const PlayList : FC<PlayListProps> = ({videoId}) =>{
   return (
       <div className="PlayList">
           {
-            videoDatas.map((video: Video)=>(<PlayListItem video={video} currenteVideoId={videoId}/>))
+            videoDatas.map((video: Video)=>(<PlayListItem key={video._id} video={video} currenteVideoId={videoId}/>))
           }
       </div>
   );

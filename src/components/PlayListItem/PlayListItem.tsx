@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 
 interface PlayListItemProps {
   video: Video
-  currenteVideoId?: String
+  currenteVideoId?: number
 }
 
 
@@ -31,7 +31,7 @@ const PlayListItem : FC<PlayListItemProps> = ({video, currenteVideoId}) =>{
 
   return (
       <div className="PlayListItem">
-        <Link to={'/reader/'+ video._id} className={currenteVideoId == video._id ? "row border current": "row border"}>
+        <Link to={'/reader/'+ video.slug} className={currenteVideoId == video._id ? "row border current": "row border"}>
          {/* <div > */}
           <div className="col-md-4">
           <img src={video.poster as string} alt={video.title} width={"100%"}/>

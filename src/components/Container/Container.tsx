@@ -13,6 +13,7 @@ import { Video } from '../../models/Video';
 import { deleteVideo, getAllVideo } from '../../api/api-video';
 import ViewVideoModal from '../ViewVideoModal/ViewVideoModal';
 import DeleteVideoModal from '../DeleteVideoModal/DeleteVideoModal';
+import UploadModal from '../UploadModal/UploadModal';
 
 
 interface ContainerProps {
@@ -29,7 +30,7 @@ const [idVideoUpdate, setIdVideoUpdate] = useState<number | null>()
 const [idVideoDelete, setIdVideoDelete] = useState<number>()
 const [displayDeleteVideoModal, setDisplayDeleteVideoModal] = useState<boolean>(false)
 // console.log(videoDatas);
-
+const [uploaModal, setUploaModal] = useState<boolean>(false)
 const runLocalData = async () => {
 
   const datas: any = await getAllVideo()
@@ -79,12 +80,23 @@ const handleConfirmDelete = async (id: number) =>{
   // videoDatas.filter((videoData)=>videoData._id !=id )
 
 }
-
+const handleUpload = async () =>{
+ 
+  setUploaModal(true)
+  
+}
   return (
       <div className="container">
+
+         <div className="d-flex gap-2 justify-content-between">
          <button className="btn btn-primary my-2" onClick={handleAddVideo}>
           Add Video
          </button>
+         <button className="btn btn-danger my-2" onClick={handleUpload}>
+          Add Many
+         </button>
+         </div>
+         
 
          {
           displayModal?
@@ -110,6 +122,15 @@ const handleConfirmDelete = async (id: number) =>{
           < DeleteVideoModal
           hideModal= {()=>setDisplayDeleteVideoModal(false)}
           idVideoDelete ={idVideoDelete}
+          actualiseContainer={runLocalData()}
+          />
+          :
+          null
+         }
+         {
+          uploaModal?
+          < UploadModal
+          hideModal= {()=>setUploaModal(false)}
           actualiseContainer={runLocalData()}
           />
           :

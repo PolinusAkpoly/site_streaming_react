@@ -10,7 +10,7 @@
   text-decoration: none;
 }
 .PlayListItem:hover .border{
-  background-color: gainsboro!important;
+  background-color: gainsboro;
   color: white;
 }
 .PlayListItem .current{
