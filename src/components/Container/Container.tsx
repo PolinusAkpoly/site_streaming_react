@@ -122,7 +122,7 @@ const handleUpload = async () =>{
           < DeleteVideoModal
           hideModal= {()=>setDisplayDeleteVideoModal(false)}
           idVideoDelete ={idVideoDelete}
-          actualiseContainer={runLocalData()}
+          actualiseContainer={()=>runLocalData()}
           />
           :
           null
@@ -131,7 +131,7 @@ const handleUpload = async () =>{
           uploaModal?
           < UploadModal
           hideModal= {()=>setUploaModal(false)}
-          actualiseContainer={runLocalData()}
+          actualiseContainer={()=>runLocalData()}
           />
           :
           null

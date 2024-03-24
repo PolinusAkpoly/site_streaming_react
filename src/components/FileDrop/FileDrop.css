@@ -5,4 +5,17 @@
   Created At : 22/03/2024 16:19:02
 */
 
-.FileDrop {}
+
+.upload-zone{
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #efefef;
+  }
+  .upload-zone.dragging {
+    background-color: #d14c4d;
+
+  }
+
+    
